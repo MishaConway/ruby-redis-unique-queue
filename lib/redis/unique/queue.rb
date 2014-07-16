@@ -1,6 +1,7 @@
+require "redis"
 require "redis/unique/queue/version"
 
-module Redis
+class Redis
   module Unique
     class Queue
       attr_reader :name
