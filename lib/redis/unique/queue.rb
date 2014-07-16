@@ -1,10 +1,11 @@
 require "redis"
-require "redis/unique/queue/version"
 
 class Redis
   module Unique
     class Queue
       attr_reader :name
+
+      VERSION = "0.0.2"
 
       def initialize(name, redis_or_options = {})
         @name  = name
