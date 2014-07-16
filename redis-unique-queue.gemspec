@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["mishaAconway@gmail.com"]
   spec.summary       = %q{A unique queue with atomic operations implemented in Redis}
   spec.description   = %q{A unique queue with atomic operations implemented in Redis.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/MishaConway/ruby-redis-unique-queue"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
