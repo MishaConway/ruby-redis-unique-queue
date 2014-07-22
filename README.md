@@ -91,6 +91,11 @@ q.peek 23 #read the item at index 23
 q.peek 10, 5 #peek at five items starting at index 10
 ```
 
+The queue can be cleared of all items
+```ruby
+q.clear
+```
+
 
 
 ## Contributing
