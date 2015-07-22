@@ -77,6 +77,12 @@ You can remove an arbitrary item from the queue. Note that it doesn't have to be
 q.remove "world"
 ```
 
+You can remove an arbitrary item from the queue by index.
+
+```ruby
+q.remove_item_by_index 2
+```
+
 You can get all items in the queue.
 
 ```ruby

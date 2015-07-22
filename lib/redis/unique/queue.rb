@@ -5,7 +5,7 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "0.0.4"
+      VERSION = "0.0.5"
 
       def initialize(name, redis_or_options = {})
         @name  = name
@@ -35,6 +35,10 @@ class Redis
 
       def remove data
         @redis.zrem name, data
+      end
+
+      def remove_item_by_index index
+        @redis.zremrangebyrank name, index, index
       end
 
       def size
