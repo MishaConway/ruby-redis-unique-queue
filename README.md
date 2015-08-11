@@ -102,6 +102,12 @@ The queue can be cleared of all items
 q.clear
 ```
 
+Optionally, the queue can also be set to expire (in seconds).
+```ruby
+# expire in five minutes
+q.expire 60*5
+```
+
 
 
 ## Contributing

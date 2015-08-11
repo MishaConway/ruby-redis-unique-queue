@@ -5,7 +5,7 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "0.0.5"
+      VERSION = "0.0.6"
 
       def initialize(name, redis_or_options = {})
         @name  = name
@@ -59,6 +59,10 @@ class Redis
 
       def clear
         @redis.del name
+      end
+
+      def expire seconds
+        @redis.expire name, seconds
       end
 
       private
