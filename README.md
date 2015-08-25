@@ -53,6 +53,12 @@ You can pop data from the queue.
 result = q.pop
 ```
 
+You can also pop all items in the queue in one op.
+
+```
+result = q.pop_all
+```
+
 You can get the size of the queue.
 
 ```ruby

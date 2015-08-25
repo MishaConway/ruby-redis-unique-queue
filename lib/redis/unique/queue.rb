@@ -5,7 +5,7 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "0.0.6"
+      VERSION = "0.0.7"
 
       def initialize(name, redis_or_options = {})
         @name  = name
@@ -25,6 +25,13 @@ class Redis
       def pop
         begin
           success, result = attempt_atomic_pop
+        end while !success && result
+        result
+      end
+
+      def pop_all
+        begin
+          success, result = attempt_atomic_pop_all
         end while !success && result
         result
       end
@@ -66,6 +73,20 @@ class Redis
       end
 
       private
+
+      def attempt_atomic_pop_all
+        result  = nil
+        success = @redis.watch(name) do
+          result = all
+          if result
+            @redis.multi do |multi|
+              multi.del name
+            end
+          end
+        end
+
+        [success, result]
+      end
 
       def attempt_atomic_pop
         min_score = 0
