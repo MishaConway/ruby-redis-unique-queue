@@ -5,7 +5,7 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "0.0.7"
+      VERSION = "0.0.9"
 
       def initialize(name, redis_or_options = {})
         @name  = name
@@ -23,17 +23,15 @@ class Redis
       end
 
       def pop
-        begin
-          success, result = attempt_atomic_pop
-        end while !success && result
-        result
+        block_on_atomic_attempt{ attempt_atomic_pop }
       end
 
       def pop_all
-        begin
-          success, result = attempt_atomic_pop_all
-        end while !success && result
-        result
+        block_on_atomic_attempt{ attempt_atomic_pop_all }
+      end
+
+      def pop_multi amount
+        block_on_atomic_attempt{ attempt_atomic_pop_multi amount }
       end
 
       def front
@@ -66,6 +64,7 @@ class Redis
 
       def clear
         @redis.del name
+        []
       end
 
       def expire seconds
@@ -74,30 +73,44 @@ class Redis
 
       private
 
-      def attempt_atomic_pop_all
-        result  = nil
-        success = @redis.watch(name) do
-          result = all
-          if result
-            @redis.multi do |multi|
-              multi.del name
-            end
-          end
-        end
+      def attempt_atomic_pop_multi amount
+        attempt_atomic_read_write lambda{ peek 0, amount }, lambda{  |multi, read_result| multi.zremrangebyrank name, 0, amount - 1 }
+      end
 
-        [success, result]
+      def attempt_atomic_pop_all
+        attempt_atomic_read_write lambda{ all }, lambda{ |multi, read_result| multi.del name}
       end
 
       def attempt_atomic_pop
         min_score = 0
         max_score = Time.now.to_f
 
+        read = lambda do
+          @redis.zrangebyscore(name, min_score, max_score, :with_scores => false, :limit => [0, 1]).first
+        end
+
+        write = lambda do |multi, read_result|
+          multi.zrem name, read_result
+        end
+
+        attempt_atomic_read_write read, write
+      end
+
+      def block_on_atomic_attempt
+        begin
+          success, result = yield
+        end while !success && result
+        result
+      end
+
+      def attempt_atomic_read_write read_op, write_op
+
         result  = nil
         success = @redis.watch(name) do
-          result = @redis.zrangebyscore(name, min_score, max_score, :with_scores => false, :limit => [0, 1]).first
+          result = read_op.call
           if result
             @redis.multi do |multi|
-              multi.zrem name, result
+              write_op.call multi, result
             end
           end
         end

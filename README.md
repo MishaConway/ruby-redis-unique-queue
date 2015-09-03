@@ -53,6 +53,12 @@ You can pop data from the queue.
 result = q.pop
 ```
 
+You can atomically pop multiple items from the queue.
+
+```ruby
+result = q.pop_multi 3
+```
+
 You can also pop all items in the queue in one op.
 
 ```
