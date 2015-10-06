@@ -47,6 +47,13 @@ q.push "world"
 q.push "hello" # the item 'hello' will only exist once in the queue since it is unique
 ```
 
+You can push multiple items onto the queue.
+
+```ruby
+q.push_multi [1,2,3]
+q.push_multi 4,5,6
+```
+
 You can pop data from the queue.
 
 ```ruby

@@ -5,7 +5,7 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "0.0.9"
+      VERSION = "1.0.0"
 
       def initialize(name, redis_or_options = {})
         @name  = name
@@ -16,10 +16,23 @@ class Redis
                  end
       end
 
-      #Add an item to the queue. delay is in seconds.
-      def push data, delay=0
-        score = Time.now.to_f + delay
+      def push data
+        score = Time.now.to_f
         @redis.zadd(name, score, data)
+      end
+
+      def push_multi *values
+        if values.size > 0
+          score = Time.now.to_f
+
+          values = values.first if 1 == values.size && values.first.kind_of?(Array)
+          scored_values = []
+          values.each_with_index do |value, i|
+            scored_values << [score + i, value]
+          end
+
+          @redis.zadd name, scored_values
+        end
       end
 
       def pop
@@ -72,7 +85,7 @@ class Redis
       end
 
       private
-
+      
       def attempt_atomic_pop_multi amount
         attempt_atomic_read_write lambda{ peek 0, amount }, lambda{  |multi, read_result| multi.zremrangebyrank name, 0, amount - 1 }
       end
