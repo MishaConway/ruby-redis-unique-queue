@@ -5,14 +5,20 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "1.0.0"
+      VERSION = "1.0.1"
+
+      class InvalidNameException < StandardError; end;
+      class InvalidRedisConfigException < StandardError; end;
 
       def initialize(name, redis_or_options = {})
+        raise InvalidNameException.new unless name.kind_of?(String) && name.size > 0
         @name  = name
         @redis = if redis_or_options.kind_of? Redis
                    redis_or_options
                  elsif redis_or_options.kind_of? Hash
                    Redis.new redis_or_options
+                 else
+                  raise InvalidRedisConfigException.new
                  end
       end
 
