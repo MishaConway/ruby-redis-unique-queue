@@ -84,6 +84,13 @@ You can read the first item in the queue.
 q.front
 ```
 
+You can read the last item in the queue.
+
+```ruby
+q.back
+```
+
+
 You can see if an item exists in the queue.
 
 ```ruby

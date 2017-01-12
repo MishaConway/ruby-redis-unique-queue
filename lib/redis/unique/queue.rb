@@ -57,6 +57,10 @@ class Redis
         @redis.zrange(name, 0, 0).first
       end
 
+      def back
+        @redis.zrevrange(name, 0, 0).first
+      end
+
       def remove data
         @redis.zrem name, data
       end
