@@ -5,14 +5,14 @@ class Redis
     class Queue
       attr_reader :name
 
-      VERSION = "1.0.2"
+      VERSION = "1.0.3"
 
       class InvalidNameException < StandardError; end;
       class InvalidRedisConfigException < StandardError; end;
 
       def initialize(name, redis_or_options = {})
         name = name.to_s if name.kind_of? Symbol
-        
+
         raise InvalidNameException.new unless name.kind_of?(String) && name.size > 0
         @name  = name
         @redis = if redis_or_options.kind_of? Redis
@@ -25,21 +25,12 @@ class Redis
       end
 
       def push data
-        score = Time.now.to_f
-        @redis.zadd(name, score, data)
+        [block_on_atomic_attempt{ attempt_atomic_push_multi(data) }].flatten.first
       end
 
       def push_multi *values
         if values.size > 0
-          score = Time.now.to_f
-
-          values = values.first if 1 == values.size && values.first.kind_of?(Array)
-          scored_values = []
-          values.each_with_index do |value, i|
-            scored_values << [score + i, value]
-          end
-
-          @redis.zadd name, scored_values
+          block_on_atomic_attempt{ attempt_atomic_push_multi(*values) }
         end
       end
 
@@ -97,7 +88,27 @@ class Redis
       end
 
       private
-      
+
+      def max_score
+        @redis.zscore name, back
+      end
+
+      def attempt_atomic_push_multi *values
+        success = @redis.watch(name) do
+          score = [Time.now.to_f, max_score].compact.max
+          values = values.first if 1 == values.size && values.first.kind_of?(Array)
+          scored_values = []
+          values.each_with_index do |value, i|
+            scored_values << [score + i, value]
+          end
+          @redis.multi do |multi|
+            multi.zadd name, scored_values
+          end
+        end
+
+        [success, values]
+      end
+
       def attempt_atomic_pop_multi amount
         attempt_atomic_read_write lambda{ peek 0, amount }, lambda{  |multi, read_result| multi.zremrangebyrank name, 0, amount - 1 }
       end
@@ -107,11 +118,8 @@ class Redis
       end
 
       def attempt_atomic_pop
-        min_score = 0
-        max_score = Time.now.to_f
-
         read = lambda do
-          @redis.zrangebyscore(name, min_score, max_score, :with_scores => false, :limit => [0, 1]).first
+          @redis.zrangebyscore(name, 0, max_score, :with_scores => false, :limit => [0, 1]).first
         end
 
         write = lambda do |multi, read_result|
