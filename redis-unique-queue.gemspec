@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'redis/unique/queue'
+require 'redis_unique_queue'
 
 Gem::Specification.new do |spec|
   spec.name          = "redis-unique-queue"
-  spec.version       = Redis::Unique::Queue::VERSION
+  spec.version       = RedisUniqueQueue::VERSION
   spec.authors       = ["Misha Conway"]
   spec.email         = ["mishaAconway@gmail.com"]
   spec.summary       = %q{A unique queue with atomic operations implemented in Redis}

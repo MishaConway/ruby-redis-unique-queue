@@ -1,4 +1,4 @@
-# Redis::Unique::Queue
+# RedisUniqueQueue
 
 A unique FIFO queue with atomic operations built on top of Redis. Useful if you want to enqueue data without worrying about it existing multiple times in the queue.
 
@@ -22,19 +22,19 @@ Or install it yourself as:
 You can instantiate a named queue using your default Redis configuration.
 
 ```ruby
-q = Redis::Unique::Queue.new 'jobs'
+q = RedisUniqueQueue.new 'jobs'
 ```
 
 Or you can pass in your own instance of the Redis class.
 
 ```ruby
-q = Redis::Unique::Queue.new 'jobs', Redis.new(:host => "10.0.1.1", :port => 6380, :db => 15)
+q = RedisUniqueQueue.new 'jobs', Redis.new(:host => "10.0.1.1", :port => 6380, :db => 15)
 ```
 
 A third option is to instead pass your Redis configurations.
 
 ```ruby
-q = Redis::Unique::Queue.new 'jobs', :host => "10.0.1.1", :port => 6380, :db => 15
+q = RedisUniqueQueue.new 'jobs', :host => "10.0.1.1", :port => 6380, :db => 15
 ```
 
 ## Using the queue
