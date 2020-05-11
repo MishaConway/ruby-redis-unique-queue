@@ -123,6 +123,14 @@ q.peek 23 #read the item at index 23
 q.peek 10, 5 #peek at five items starting at index 10
 ```
 
+You can also peek into arbitrary ranges in the queue in reverse order.
+
+```ruby
+q.peek_reverse 0 #read the last item in the queue
+q.peek_reverse 7 #read the item at index 7 starting at the end of the queue
+q.peek_reverse 2, 5 #peek at five items starting at index 2 in reverse order
+```
+
 The queue can be cleared of all items
 ```ruby
 q.clear

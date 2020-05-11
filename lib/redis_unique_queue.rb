@@ -3,7 +3,7 @@ require "redis"
 class RedisUniqueQueue
 	attr_reader :name
 
-	VERSION = "2.0"
+	VERSION = "2.1"
 
 	class InvalidNameException < StandardError; end;
 	class InvalidRedisConfigException < StandardError; end;
@@ -80,6 +80,10 @@ class RedisUniqueQueue
 
 	def peek index, amount = 1
 		with { |redis| redis.zrange name, index, index + amount - 1 }
+	end
+
+	def peek_reverse index, amount = 1
+		with { |redis| redis.zrevrange name, index, index + amount - 1 }
 	end
 
 	def include? data

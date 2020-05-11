@@ -123,6 +123,25 @@ describe RedisUniqueQueue do
 					expect(queue.size).to eq(3)
 					expect(queue.all).to eq(%w(a b c))
 				end
+      end
+
+			describe '#peek_reverse' do
+				it 'allows you to peek at items in the queue in reverse order without mutating the queue' do
+					expect(queue.peek_reverse(0,1)).to eq(%w(c))
+					expect(queue.peek_reverse(1,1)).to eq(%w(b))
+					expect(queue.peek_reverse(2,1)).to eq(%w(a))
+					expect(queue.peek_reverse(3,1)).to eq([])
+
+					expect(queue.peek_reverse(0,2)).to eq(%w(c b))
+					expect(queue.peek_reverse(0,3)).to eq(%w(c b a))
+					expect(queue.peek_reverse(0,4)).to eq(%w(c b a))
+
+					expect(queue.peek_reverse(1,2)).to eq(%w(b a))
+					expect(queue.peek_reverse(1,3)).to eq(%w(b a))
+
+					expect(queue.size).to eq(3)
+					expect(queue.all).to eq(%w(a b c))
+				end
 			end
 
 			describe '#include?' do
